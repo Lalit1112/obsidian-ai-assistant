@@ -1,16 +1,17 @@
 # Obsidian AI Assistant
 
-Simple plugin to enable interactions with AI models such as [OpenAI ChatGPT](https://openai.com/blog/chatgpt), [Anthropic Claude](https://docs.anthropic.com/en/docs/models-overview), [OpenAI DALL·E](https://openai.com/product/dall-e-3), [OpenAI Whisper](https://openai.com/research/whisper) directly from your [Obsidian](https://obsidian.md/) notes.
+Simple plugin to enable interactions with AI models such as [OpenAI ChatGPT](https://openai.com/blog/chatgpt), [Anthropic Claude](https://docs.anthropic.com/en/docs/models-overview), [Google Gemini](https://ai.google.dev/gemini-api), [OpenAI DALL·E](https://openai.com/product/dall-e-3), [OpenAI Whisper](https://openai.com/research/whisper) directly from your [Obsidian](https://obsidian.md/) notes.
 
 The current available features of this plugin are:
 
--   🤖 Text assistant with OpenAI GPTs and Anthropic Claude models,
+-   🤖 Text assistant with OpenAI GPTs, Anthropic Claude, and Google Gemini models,
 -   🖼 Image generation with DALL·E3 and DALL·E2,
 -   🗣 Speech to text with Whisper.
 
 ## Latest Updates
 
 - Claude 4 models and OpenAI o3 / o4 series are now available.
+- **NEW**: Google Gemini 2.5 Pro and 2.5 Flash models now supported!
 
 ## How to use
 
@@ -55,7 +56,7 @@ The transcript will be immediately added to your note at your cursor location.
 
 ### Text Assistant
 
--   **Model choice**: choice of the text model. Latest OpenAI and Anthropic models are available.
+-   **Model choice**: choice of the text model. Latest OpenAI, Anthropic, and Google Gemini models are available.
 -   **Maximum number of tokens** in the generated answer
 -   **Replace or Add below**: In prompt mode, after having selected text from your note and enter your prompt,
     you can decide to replace your text by the assistant answer or to paste it bellow.
@@ -74,7 +75,7 @@ The transcript will be immediately added to your note at your cursor location.
 
 #### From the community plugins
 
-You can install the [AI Assistant](https://obsidian.md/plugins?id=ai-assistant) directly from the Obsidian community plugins.
+<!-- Community plugin submission coming soon - install from GitHub for now -->
 
 #### Get latest version from git
 
@@ -87,5 +88,6 @@ You can install the [AI Assistant](https://obsidian.md/plugins?id=ai-assistant) 
 ## Requirements
 
 -   To use this plugin, with OpenAI models, you need an official API key from [here](https://platform.openai.com/account/api-keys),
--   To use this plugin, with Anthropic Claude models, you need an official API key from [here](https://console.anthropic.com/settings/keys).
+-   To use this plugin, with Anthropic Claude models, you need an official API key from [here](https://console.anthropic.com/settings/keys),
+-   To use this plugin, with Google Gemini models, you need an official API key from [here](https://ai.google.dev/gemini-api/docs/api-key).
 
