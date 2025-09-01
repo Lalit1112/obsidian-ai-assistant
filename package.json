@@ -9,7 +9,7 @@
 		"version": "node version-bump.mjs && git add manifest.json versions.json"
 	},
 	"keywords": [],
-	"author": "Quentin Grail",
+	"author": "Lalit Pamnani",
 	"license": "MIT",
 	"devDependencies": {
 		"@types/node": "^20.8.10",
@@ -22,6 +22,7 @@
 		"typescript": "5.2.2"
 	},
 	"dependencies": {
+		"@google/genai": "^1.16.0",
 		"openai": "^4.16.1",
 		"prettier": "^3.0.3"
 	}

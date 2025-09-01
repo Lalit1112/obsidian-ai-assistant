@@ -1,9 +1,9 @@
 {
-	"id": "ai-assistant",
-	"name": "AI Assistant",
+	"id": "new-obsidian-ai-assistant",
+	"name": "New AI Assistant",
 	"version": "1.6.2",
 	"minAppVersion": "0.15.0",
 	"description": "AI Assistant plugin for Obsidian",
-	"author": "Quentin Grail",
+	"author": "Lalit Pamnani",
 	"isDesktopOnly": false
 }

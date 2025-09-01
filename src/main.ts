@@ -7,7 +7,7 @@ import {
 	Setting,
 } from "obsidian";
 import { ChatModal, ImageModal, PromptModal, SpeechModal } from "./modal";
-import { AnthropicAssistant, OpenAIAssistant } from "./openai_api";
+import { AnthropicAssistant, GeminiAssistant, OpenAIAssistant } from "./openai_api";
 import {
 	ALL_IMAGE_MODELS,
 	ALL_MODELS,
@@ -20,6 +20,7 @@ interface AiAssistantSettings {
 	mySetting: string;
 	openAIapiKey: string;
 	anthropicApiKey: string;
+	geminiApiKey: string;
 	modelName: string;
 	imageModelName: string;
 	maxTokens: number;
@@ -32,6 +33,7 @@ const DEFAULT_SETTINGS: AiAssistantSettings = {
 	mySetting: "default",
 	openAIapiKey: "",
 	anthropicApiKey: "",
+	geminiApiKey: "",
 	modelName: DEFAULT_OAI_IMAGE_MODEL,
 	imageModelName: DEFAULT_IMAGE_MODEL,
 	maxTokens: DEFAULT_MAX_TOKENS,
@@ -49,6 +51,13 @@ export default class AiAssistantPlugin extends Plugin {
 			this.aiAssistant = new AnthropicAssistant(
 				this.settings.openAIapiKey,
 				this.settings.anthropicApiKey,
+				this.settings.modelName,
+				this.settings.maxTokens,
+			);
+		} else if (this.settings.modelName.includes("gemini")) {
+			this.aiAssistant = new GeminiAssistant(
+				this.settings.openAIapiKey,
+				this.settings.geminiApiKey,
 				this.settings.modelName,
 				this.settings.maxTokens,
 			);
@@ -198,6 +207,17 @@ class AiAssistantSettingTab extends PluginSettingTab {
 					this.plugin.build_api();
 				}),
 		);
+
+		new Setting(containerEl).setName("Gemini API Key").addText((text) =>
+			text
+				.setPlaceholder("Enter Gemini key here")
+				.setValue(this.plugin.settings.geminiApiKey)
+				.onChange(async (value) => {
+					this.plugin.settings.geminiApiKey = value;
+					await this.plugin.saveSettings();
+					this.plugin.build_api();
+				}),
+		);
 		containerEl.createEl("h3", { text: "Text Assistant" });
 
 		new Setting(containerEl)
@@ -290,14 +310,5 @@ class AiAssistantSettingTab extends PluginSettingTab {
 					}),
 			);
 
-		const div = containerEl.createDiv({ cls: "coffee-container" });
-		div.createEl("a", {
-			href: "https://buymeacoffee.com/qgrail",
-		}).createEl("img", {
-			attr: {
-				src: "https://cdn.buymeacoffee.com/buttons/v2/default-violet.png",
-			},
-			cls: "coffee-button-img",
-		});
 	}
 }

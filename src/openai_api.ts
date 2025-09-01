@@ -1,6 +1,7 @@
 import { MarkdownView, Notice, request } from "obsidian";
 
 import { OpenAI } from "openai";
+import { GoogleGenAI } from "@google/genai";
 
 import { DEFAULT_OAI_IMAGE_MODEL, OAI_IMAGE_CAPABLE_MODELS } from "./settings";
 
@@ -170,6 +171,47 @@ export class AnthropicAssistant extends OpenAIAssistant {
 			});
 
 			return JSON.parse(response).content[0].text;
+		} catch (err) {
+			this.display_error(err);
+		}
+	};
+}
+
+export class GeminiAssistant extends OpenAIAssistant {
+	geminiApiKey: string;
+	genAI: GoogleGenAI;
+
+	constructor(
+		openAIapiKey: string,
+		geminiApiKey: string,
+		modelName: string,
+		maxTokens: number,
+	) {
+		super(openAIapiKey, modelName, maxTokens);
+
+		this.geminiApiKey = geminiApiKey;
+		this.genAI = new GoogleGenAI({ apiKey: geminiApiKey });
+	}
+
+	display_error = (err: any) => {
+		new Notice(`## Gemini API Error: ${err}.`);
+	};
+
+	text_api_call = async (
+		prompt_list: { [key: string]: string }[],
+		htmlEl?: HTMLElement,
+		view?: MarkdownView,
+	) => {
+		try {
+			// Convert messages to Gemini format
+			const prompt = prompt_list.map(msg => msg.content).join('\n');
+
+			const response = await this.genAI.models.generateContent({
+				model: this.modelName,
+				contents: prompt,
+			});
+
+			return response.text;
 		} catch (err) {
 			this.display_error(err);
 		}

@@ -32,6 +32,8 @@ export const ALL_MODELS = {
 	"claude-3-opus-latest": "Claude 3 Opus",
 	"claude-3-5-sonnet-latest": "Claude 3.5 Sonnet",
 	"claude-3-5-haiku-latest": "Claude 3.5 Haiku",
+	"gemini-2.5-pro": "Gemini 2.5 Pro",
+	"gemini-2.5-flash": "Gemini 2.5 Flash",
 };
 
 export const ALL_IMAGE_MODELS = {

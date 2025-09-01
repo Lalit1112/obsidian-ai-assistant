@@ -79,7 +79,7 @@ You can install the [AI Assistant](https://obsidian.md/plugins?id=ai-assistant) 
 #### Get latest version from git
 
 1. `cd path/to/vault/.obsidian/plugins`
-2. `git clone https://github.com/qgrail/obsidian-ai-assistant.git && cd obsidian-ai-assistant`
+2. `git clone https://github.com/Lalit1112/obsidian-ai-assistant.git && cd obsidian-ai-assistant`
 3. `npm install && npm run build`
 4. Open **Obsidian Preferences** -> **Community plugins**
 5. Refresh Installed plugins and activate AI Assistant.
@@ -89,4 +89,3 @@ You can install the [AI Assistant](https://obsidian.md/plugins?id=ai-assistant) 
 -   To use this plugin, with OpenAI models, you need an official API key from [here](https://platform.openai.com/account/api-keys),
 -   To use this plugin, with Anthropic Claude models, you need an official API key from [here](https://console.anthropic.com/settings/keys).
 
-<a href="https://www.buymeacoffee.com/qgrail" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-violet.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
