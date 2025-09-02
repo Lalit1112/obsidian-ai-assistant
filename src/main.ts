@@ -27,6 +27,9 @@ interface AiAssistantSettings {
 	replaceSelection: boolean;
 	imgFolder: string;
 	language: string;
+	customPrompt1: string;
+	customPrompt2: string;
+	customPrompt3: string;
 }
 
 const DEFAULT_SETTINGS: AiAssistantSettings = {
@@ -40,6 +43,9 @@ const DEFAULT_SETTINGS: AiAssistantSettings = {
 	replaceSelection: true,
 	imgFolder: "AiAssistant/Assets",
 	language: "",
+	customPrompt1: "",
+	customPrompt2: "",
+	customPrompt3: "",
 };
 
 export default class AiAssistantPlugin extends Plugin {
@@ -113,7 +119,11 @@ export default class AiAssistantPlugin extends Plugin {
 						}
 					},
 					false,
-					{},
+					{
+						customPrompt1: this.settings.customPrompt1,
+						customPrompt2: this.settings.customPrompt2,
+						customPrompt3: this.settings.customPrompt3,
+					},
 				).open();
 			},
 		});
@@ -315,6 +325,51 @@ class AiAssistantSettingTab extends PluginSettingTab {
 						this.plugin.settings.language = value;
 						await this.plugin.saveSettings();
 					}),
+			);
+
+		containerEl.createEl("h3", { text: "Custom Prompts" });
+		containerEl.createEl("p", {
+			text: "Define up to 3 custom prompts that will appear as quick-select options in prompt mode:",
+			cls: "setting-item-description"
+		});
+
+		new Setting(containerEl)
+			.setName("Custom Prompt 1")
+			.setDesc("First custom prompt")
+			.addText((text) =>
+				text
+					.setPlaceholder("e.g., Translate to Spanish")
+					.setValue(this.plugin.settings.customPrompt1)
+					.onChange(async (value) => {
+						this.plugin.settings.customPrompt1 = value;
+						await this.plugin.saveSettings();
+					})
+			);
+
+		new Setting(containerEl)
+			.setName("Custom Prompt 2")
+			.setDesc("Second custom prompt")
+			.addText((text) =>
+				text
+					.setPlaceholder("e.g., Summarize this text")
+					.setValue(this.plugin.settings.customPrompt2)
+					.onChange(async (value) => {
+						this.plugin.settings.customPrompt2 = value;
+						await this.plugin.saveSettings();
+					})
+			);
+
+		new Setting(containerEl)
+			.setName("Custom Prompt 3")
+			.setDesc("Third custom prompt")
+			.addText((text) =>
+				text
+					.setPlaceholder("e.g., Fix grammar and spelling")
+					.setValue(this.plugin.settings.customPrompt3)
+					.onChange(async (value) => {
+						this.plugin.settings.customPrompt3 = value;
+						await this.plugin.saveSettings();
+					})
 			);
 
 	}

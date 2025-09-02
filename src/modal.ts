@@ -187,6 +187,7 @@ export class PromptModal extends Modal {
 		const { contentEl } = this;
 		this.titleEl.setText("What can I do for you?");
 
+		// Create input field first
 		const input_container = contentEl.createEl("div", {
 			cls: "chat-button-container-right",
 		});
@@ -195,6 +196,55 @@ export class PromptModal extends Modal {
 			placeholder: "Your prompt here",
 			type: "text",
 		});
+
+		// Add dropdown for custom prompts if any are defined
+		const customPrompts = [
+			this.settings.customPrompt1,
+			this.settings.customPrompt2,
+			this.settings.customPrompt3,
+		].filter(prompt => prompt && prompt.trim() !== "");
+
+		if (customPrompts.length > 0) {
+			const dropdown_container = contentEl.createEl("div", {
+				cls: "prompt-dropdown-container",
+				attr: { style: "margin-bottom: 10px; order: -1;" }
+			});
+
+			const dropdown_label = dropdown_container.createEl("label", {
+				text: "Quick prompts:",
+				attr: { style: "display: block; margin-bottom: 5px; font-weight: bold;" }
+			});
+
+			const dropdown = dropdown_container.createEl("select", {
+				attr: { style: "width: 100%; padding: 5px; margin-bottom: 10px;" }
+			});
+
+			// Add default option
+			dropdown.createEl("option", {
+				value: "",
+				text: "Choose a prompt or type your own below..."
+			});
+
+			// Add custom prompts
+			customPrompts.forEach((prompt, index) => {
+				dropdown.createEl("option", {
+					value: prompt,
+					text: `${index + 1}. ${prompt.length > 50 ? prompt.substring(0, 50) + "..." : prompt}`
+				});
+			});
+
+			dropdown.addEventListener("change", (evt) => {
+				const selectedPrompt = (evt.target as HTMLSelectElement).value;
+				if (selectedPrompt) {
+					input_field.value = selectedPrompt;
+					input_field.focus();
+				}
+			});
+
+			// Move dropdown above input field
+			contentEl.insertBefore(dropdown_container, input_container);
+		}
+
 		input_field.addEventListener("keypress", (evt) => {
 			if (evt.key === "Enter") {
 				this.param_dict["prompt_text"] = input_field.value.trim();
