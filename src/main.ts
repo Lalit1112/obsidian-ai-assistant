@@ -98,11 +98,18 @@ export default class AiAssistantPlugin extends Plugin {
 							},
 						]);
 						answer = answer!;
-						if (!this.settings.replaceSelection) {
-							answer = selected_text + "\n" + answer.trim();
-						}
-						if (answer) {
-							editor.replaceSelection(answer.trim());
+						if (this.settings.replaceSelection) {
+							// Replace the selected text with AI answer
+							if (answer) {
+								editor.replaceSelection(answer.trim());
+							}
+						} else {
+							// Keep original text and insert AI answer below
+							if (answer) {
+								const cursor = editor.getCursor("to");
+								editor.setCursor(cursor.line, cursor.ch);
+								editor.replaceRange("\n" + answer.trim(), cursor);
+							}
 						}
 					},
 					false,
@@ -255,7 +262,7 @@ class AiAssistantSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Prompt behavior")
-			.setDesc("Replace selection")
+			.setDesc("When ON: Replace selected text with AI response. When OFF: Keep selected text and add AI response below it.")
 			.addToggle((toogle) => {
 				toogle
 					.setValue(this.plugin.settings.replaceSelection)
