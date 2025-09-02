@@ -204,7 +204,18 @@ export class PromptModal extends Modal {
 			this.settings.customPrompt3,
 		].filter(prompt => prompt && prompt.trim() !== "");
 
-		if (customPrompts.length > 0) {
+		// Always add the hardcoded "Fix grammar and spelling" option
+		const hardcodedPrompts = [
+			{
+				key: "GRAMMAR_FIX",
+				display: "📝 Fix grammar and spelling (with highlights)",
+				prompt: "Fix grammar and spelling errors in the following text. In your response, highlight all the changes you made using ==text== markdown syntax around the corrected words or phrases. Only respond with the corrected text, no explanations or additional commentary."
+			}
+		];
+
+		const hasPrompts = customPrompts.length > 0 || hardcodedPrompts.length > 0;
+
+		if (hasPrompts) {
 			const dropdown_container = contentEl.createEl("div", {
 				cls: "prompt-dropdown-container",
 				attr: { style: "margin-bottom: 10px; order: -1;" }
@@ -225,18 +236,42 @@ export class PromptModal extends Modal {
 				text: "Choose a prompt or type your own below..."
 			});
 
+			// Add hardcoded prompts first
+			hardcodedPrompts.forEach((promptObj) => {
+				dropdown.createEl("option", {
+					value: promptObj.key,
+					text: promptObj.display
+				});
+			});
+
+			// Add separator if we have both hardcoded and custom prompts
+			if (hardcodedPrompts.length > 0 && customPrompts.length > 0) {
+				dropdown.createEl("option", {
+					value: "",
+					text: "──────────────────────",
+					attr: { disabled: "true", style: "font-size: 12px; color: gray;" }
+				});
+			}
+
 			// Add custom prompts
 			customPrompts.forEach((prompt, index) => {
 				dropdown.createEl("option", {
 					value: prompt,
-					text: `${index + 1}. ${prompt.length > 50 ? prompt.substring(0, 50) + "..." : prompt}`
+					text: `Custom ${index + 1}: ${prompt.length > 40 ? prompt.substring(0, 40) + "..." : prompt}`
 				});
 			});
 
 			dropdown.addEventListener("change", (evt) => {
-				const selectedPrompt = (evt.target as HTMLSelectElement).value;
-				if (selectedPrompt) {
-					input_field.value = selectedPrompt;
+				const selectedValue = (evt.target as HTMLSelectElement).value;
+				if (selectedValue) {
+					// Check if it's a hardcoded prompt
+					const hardcodedPrompt = hardcodedPrompts.find(p => p.key === selectedValue);
+					if (hardcodedPrompt) {
+						input_field.value = hardcodedPrompt.prompt;
+					} else {
+						// It's a custom prompt
+						input_field.value = selectedValue;
+					}
 					input_field.focus();
 				}
 			});

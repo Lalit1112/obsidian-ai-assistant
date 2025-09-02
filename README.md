@@ -40,7 +40,9 @@ Chat mode now allows you to upload images to interact with GPT4-Vision or Claude
 Prompt mode allows you to use a selected piece of text from your note as input for the assistant.
 From here you can ask the assistant to translate, summarize, generate code etc.
 
-**Custom Prompts**: Define up to 3 frequently used prompts in the settings (e.g., "Translate to Spanish", "Summarize this text", "Fix grammar and spelling"). These will appear as quick-select options in the prompt modal, saving you time on common tasks.
+**Custom Prompts**: Define up to 3 frequently used prompts in the settings (e.g., "Translate to Spanish", "Summarize this text"). These will appear as quick-select options in the prompt modal, saving you time on common tasks.
+
+**Grammar Fix**: A built-in "📝 Fix grammar and spelling (with highlights)" option is always available in the dropdown. This special prompt will highlight all changes made using ==markdown highlighting== syntax, making it easy to see exactly what was corrected.
 
 ### 🖼 Image Assistant
 
