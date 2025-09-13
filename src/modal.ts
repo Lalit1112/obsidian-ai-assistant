@@ -209,7 +209,12 @@ export class PromptModal extends Modal {
 			{
 				key: "GRAMMAR_FIX",
 				display: "📝 Fix grammar and spelling (with highlights)",
-				prompt: "Fix grammar and spelling errors in the following text. In your response, highlight all the changes you made using ==text== markdown syntax around the corrected words or phrases. Only respond with the corrected text, no explanations or additional commentary."
+				prompt: "Revise the following text for grammar, spelling, clarity, and style. Correct errors, rephrase awkward sentences, and convert passive voice to active voice where it improves flow and impact. Ensure the original meaning is preserved. In your response, highlight all changes using ==text== markdown syntax. Only provide the corrected text, with no additional commentary."
+			},
+			{
+				key: "MARKDOWN_STRUCTURE",
+				display: "🏗️ Suggest markdown structure improvements",
+				prompt: "Act as an expert in document structuring using markdown. Analyze the following note and provide a bulleted list of actionable suggestions to improve its organization and readability. Your feedback should cover:\n\nHeading Hierarchy: Correct use of H1, H2, H3, etc.\n\nUse of Lists: Where to use bulleted or numbered lists to break up text.\n\nEmphasis: Better use of bold, italics, and highlights.\n\nCallouts & Blockquotes: Opportunities to use callouts (>[!info]) or blockquotes (>) to emphasize key information.\n\nFor each suggestion, briefly explain the reasoning behind it."
 			}
 		];
 
