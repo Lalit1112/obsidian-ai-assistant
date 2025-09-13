@@ -42,7 +42,7 @@ export class OpenAIAssistant {
 			model = DEFAULT_OAI_IMAGE_MODEL;
 		}
 		try {
-			const is_reasonning_model = /o[124]/.test(model);
+			const is_reasonning_model = /o[124]/.test(model) || model.startsWith("gpt-5");
 			const params = {
 				messages: prompt_list,
 				model: model,
