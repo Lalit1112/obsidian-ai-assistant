@@ -18,6 +18,10 @@ export const ALL_MODELS = {
 	"claude-sonnet-4-20250514": "Claude Sonnet 4",
 	"gemini-2.5-pro": "Gemini 2.5 Pro",
 	"gemini-2.5-flash": "Gemini 2.5 Flash",
+	"llama-3.3-70b-versatile": "Llama 3.3 70B Versatile",
+	"qwen/qwen3-32b": "Qwen 3 32B",
+	"openai/gpt-oss-120b": "GPT-OSS 120B",
+	"deepseek-r1-distill-llama-70b": "DeepSeek R1 Distill Llama 70B",
 };
 
 export const ALL_IMAGE_MODELS = {

@@ -7,7 +7,7 @@ import {
 	Setting,
 } from "obsidian";
 import { ChatModal, ImageModal, PromptModal, SpeechModal } from "./modal";
-import { AnthropicAssistant, GeminiAssistant, OpenAIAssistant } from "./openai_api";
+import { AnthropicAssistant, GeminiAssistant, GroqAssistant, OpenAIAssistant } from "./openai_api";
 import {
 	ALL_IMAGE_MODELS,
 	ALL_MODELS,
@@ -21,6 +21,7 @@ interface AiAssistantSettings {
 	openAIapiKey: string;
 	anthropicApiKey: string;
 	geminiApiKey: string;
+	groqApiKey: string;
 	modelName: string;
 	critiqueModelName: string;
 	imageModelName: string;
@@ -38,6 +39,7 @@ const DEFAULT_SETTINGS: AiAssistantSettings = {
 	openAIapiKey: "",
 	anthropicApiKey: "",
 	geminiApiKey: "",
+	groqApiKey: "",
 	modelName: "gpt-4o",
 	critiqueModelName: "claude-opus-4-1-20250805",
 	imageModelName: DEFAULT_IMAGE_MODEL,
@@ -223,12 +225,14 @@ Critique:`;
 
 	onunload() {}
 
-	getAssistantForModel(modelName: string): OpenAIAssistant | AnthropicAssistant | GeminiAssistant {
+	getAssistantForModel(modelName: string): OpenAIAssistant | AnthropicAssistant | GeminiAssistant | GroqAssistant {
 		// Determine which assistant to use based on model name
 		if (modelName.startsWith("claude")) {
 			return new AnthropicAssistant(this.settings.openAIapiKey, this.settings.anthropicApiKey, modelName, this.settings.maxTokens);
 		} else if (modelName.startsWith("gemini")) {
 			return new GeminiAssistant(this.settings.openAIapiKey, this.settings.geminiApiKey, modelName, this.settings.maxTokens);
+		} else if (modelName.includes("llama") || modelName.includes("qwen") || modelName.includes("deepseek") || modelName.includes("gpt-oss")) {
+			return new GroqAssistant(this.settings.openAIapiKey, this.settings.groqApiKey, modelName, this.settings.maxTokens);
 		} else {
 			// Default to OpenAI for all other models
 			return new OpenAIAssistant(this.settings.openAIapiKey, modelName, this.settings.maxTokens);
@@ -306,6 +310,17 @@ class AiAssistantSettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.geminiApiKey)
 				.onChange(async (value) => {
 					this.plugin.settings.geminiApiKey = value;
+					await this.plugin.saveSettings();
+					this.plugin.build_api();
+				}),
+		);
+
+		new Setting(containerEl).setName("Groq API Key").addText((text) =>
+			text
+				.setPlaceholder("Enter Groq key here")
+				.setValue(this.plugin.settings.groqApiKey)
+				.onChange(async (value) => {
+					this.plugin.settings.groqApiKey = value;
 					await this.plugin.saveSettings();
 					this.plugin.build_api();
 				}),

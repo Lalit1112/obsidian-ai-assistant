@@ -2,6 +2,7 @@ import { MarkdownView, Notice, request } from "obsidian";
 
 import { OpenAI } from "openai";
 import { GoogleGenAI } from "@google/genai";
+import Groq from "groq-sdk";
 
 import { DEFAULT_OAI_IMAGE_MODEL, OAI_IMAGE_CAPABLE_MODELS } from "./settings";
 
@@ -212,6 +213,69 @@ export class GeminiAssistant extends OpenAIAssistant {
 			});
 
 			return response.text;
+		} catch (err) {
+			this.display_error(err);
+		}
+	};
+}
+
+export class GroqAssistant extends OpenAIAssistant {
+	groqApiKey: string;
+	groqClient: Groq;
+
+	constructor(
+		openAIapiKey: string,
+		groqApiKey: string,
+		modelName: string,
+		maxTokens: number,
+	) {
+		super(openAIapiKey, modelName, maxTokens);
+
+		this.groqApiKey = groqApiKey;
+		this.groqClient = new Groq({
+			apiKey: groqApiKey,
+		});
+	}
+
+	display_error = (err: any) => {
+		new Notice(`## Groq API Error: ${err}.`);
+	};
+
+	text_api_call = async (
+		prompt_list: { [key: string]: string }[],
+		htmlEl?: HTMLElement,
+		view?: MarkdownView,
+	) => {
+		try {
+			const streamMode = htmlEl !== undefined;
+
+			if (streamMode) {
+				const response = await this.groqClient.chat.completions.create({
+					messages: prompt_list as any,
+					model: this.modelName,
+					max_tokens: this.maxTokens,
+					stream: true,
+				});
+
+				let responseText = "";
+				for await (const chunk of response) {
+					const content = chunk.choices[0]?.delta?.content;
+					if (content) {
+						responseText = responseText.concat(content);
+						htmlEl.innerHTML = responseText;
+					}
+				}
+				return responseText;
+			} else {
+				const response = await this.groqClient.chat.completions.create({
+					messages: prompt_list as any,
+					model: this.modelName,
+					max_tokens: this.maxTokens,
+					stream: false,
+				});
+
+				return response.choices[0].message.content;
+			}
 		} catch (err) {
 			this.display_error(err);
 		}

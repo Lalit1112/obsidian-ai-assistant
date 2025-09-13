@@ -23,6 +23,7 @@
 	},
 	"dependencies": {
 		"@google/genai": "^1.16.0",
+		"groq-sdk": "^0.7.0",
 		"openai": "^4.16.1",
 		"prettier": "^3.0.3"
 	}
