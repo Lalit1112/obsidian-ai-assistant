@@ -234,6 +234,7 @@ export class GroqAssistant extends OpenAIAssistant {
 		this.groqApiKey = groqApiKey;
 		this.groqClient = new Groq({
 			apiKey: groqApiKey,
+			dangerouslyAllowBrowser: true,
 		});
 	}
 
