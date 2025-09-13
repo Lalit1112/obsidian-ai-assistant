@@ -22,6 +22,7 @@ interface AiAssistantSettings {
 	anthropicApiKey: string;
 	geminiApiKey: string;
 	modelName: string;
+	critiqueModelName: string;
 	imageModelName: string;
 	maxTokens: number;
 	replaceSelection: boolean;
@@ -38,6 +39,7 @@ const DEFAULT_SETTINGS: AiAssistantSettings = {
 	anthropicApiKey: "",
 	geminiApiKey: "",
 	modelName: DEFAULT_OAI_IMAGE_MODEL,
+	critiqueModelName: "claude-sonnet-4-20250514",
 	imageModelName: DEFAULT_IMAGE_MODEL,
 	maxTokens: DEFAULT_MAX_TOKENS,
 	replaceSelection: true,
@@ -96,26 +98,63 @@ export default class AiAssistantPlugin extends Plugin {
 				new PromptModal(
 					this.app,
 					async (x: { [key: string]: string }) => {
-						let answer = await this.aiAssistant.text_api_call([
+						const selectedModel = x["selectedModel"] || this.settings.modelName;
+						const critiqueEnabled = x["critiqueEnabled"] === "true";
+						const selectedCritiqueModel = x["selectedCritiqueModel"] || this.settings.critiqueModelName;
+
+						// Get the appropriate assistant based on selected model
+						const primaryAssistant = this.getAssistantForModel(selectedModel);
+
+						// Primary model call
+						let answer = await primaryAssistant.text_api_call([
 							{
 								role: "user",
-								content:
-									x["prompt_text"] + " : " + selected_text,
+								content: x["prompt_text"] + " : " + selected_text,
 							},
 						]);
 						answer = answer!;
-						if (this.settings.replaceSelection) {
-							// Replace the selected text with AI answer
-							if (answer) {
-								editor.replaceSelection(answer.trim());
-							}
+						
+						if (critiqueEnabled && answer) {
+							// Show primary response first
+							this.insertResponse(editor, selected_text, answer);
+							
+							// Show notice about critique preparation
+							new Notice("Preparing critique... This will take about 60 seconds.");
+							
+							// Wait 60 seconds, then call critique model
+							setTimeout(async () => {
+								try {
+									const critiqueAssistant = this.getAssistantForModel(selectedCritiqueModel);
+									const critiquePrompt = `Review the following response and provide constructive feedback. Focus on accuracy, clarity, completeness, and potential improvements. Do not rewrite the content - only provide analytical comments and suggestions.
+
+Original request: "${x["prompt_text"]}"
+Original text: "${selected_text}"
+Response to critique: "${answer}"
+
+Your critique:`;
+
+									const critique = await critiqueAssistant.text_api_call([
+										{
+											role: "user",
+											content: critiquePrompt,
+										},
+									]);
+
+									if (critique) {
+										// Insert critique below the primary response
+										const cursor = editor.getCursor("to");
+										const critiqueText = `\n\n---\n**🤔 Critique:**\n${critique.trim()}`;
+										editor.setCursor(cursor.line, cursor.ch);
+										editor.replaceRange(critiqueText, cursor);
+										new Notice("Critique completed!");
+									}
+								} catch (error) {
+									new Notice("Error generating critique: " + error.message);
+								}
+							}, 60000); // 60 second delay
 						} else {
-							// Keep original text and insert AI answer below
-							if (answer) {
-								const cursor = editor.getCursor("to");
-								editor.setCursor(cursor.line, cursor.ch);
-								editor.replaceRange("\n" + answer.trim(), cursor);
-							}
+							// No critique - just insert the primary response
+							this.insertResponse(editor, selected_text, answer);
 						}
 					},
 					false,
@@ -123,6 +162,8 @@ export default class AiAssistantPlugin extends Plugin {
 						customPrompt1: this.settings.customPrompt1,
 						customPrompt2: this.settings.customPrompt2,
 						customPrompt3: this.settings.customPrompt3,
+						modelName: this.settings.modelName,
+						critiqueModelName: this.settings.critiqueModelName,
 					},
 				).open();
 			},
@@ -175,6 +216,34 @@ export default class AiAssistantPlugin extends Plugin {
 	}
 
 	onunload() {}
+
+	getAssistantForModel(modelName: string): OpenAIAssistant | AnthropicAssistant | GeminiAssistant {
+		// Determine which assistant to use based on model name
+		if (modelName.startsWith("claude")) {
+			return new AnthropicAssistant(this.settings.openAIapiKey, this.settings.anthropicApiKey, modelName, this.settings.maxTokens);
+		} else if (modelName.startsWith("gemini")) {
+			return new GeminiAssistant(this.settings.openAIapiKey, this.settings.geminiApiKey, modelName, this.settings.maxTokens);
+		} else {
+			// Default to OpenAI for all other models
+			return new OpenAIAssistant(this.settings.openAIapiKey, modelName, this.settings.maxTokens);
+		}
+	}
+
+	insertResponse(editor: Editor, selectedText: string, response: string) {
+		if (this.settings.replaceSelection) {
+			// Replace the selected text with AI answer
+			if (response) {
+				editor.replaceSelection(response.trim());
+			}
+		} else {
+			// Keep original text and insert AI answer below
+			if (response) {
+				const cursor = editor.getCursor("to");
+				editor.setCursor(cursor.line, cursor.ch);
+				editor.replaceRange("\n" + response.trim(), cursor);
+			}
+		}
+	}
 
 	async loadSettings() {
 		this.settings = Object.assign(
@@ -239,13 +308,27 @@ class AiAssistantSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Model Name")
-			.setDesc("Select your model")
+			.setDesc("Select your default model")
 			.addDropdown((dropdown) =>
 				dropdown
 					.addOptions(ALL_MODELS)
 					.setValue(this.plugin.settings.modelName)
 					.onChange(async (value) => {
 						this.plugin.settings.modelName = value;
+						await this.plugin.saveSettings();
+						this.plugin.build_api();
+					}),
+			);
+
+		new Setting(containerEl)
+			.setName("Critique Model")
+			.setDesc("Select default model for critique mode (should be stronger than primary model)")
+			.addDropdown((dropdown) =>
+				dropdown
+					.addOptions(ALL_MODELS)
+					.setValue(this.plugin.settings.critiqueModelName)
+					.onChange(async (value) => {
+						this.plugin.settings.critiqueModelName = value;
 						await this.plugin.saveSettings();
 						this.plugin.build_api();
 					}),

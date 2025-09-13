@@ -8,6 +8,7 @@ import {
 	requestUrl,
 } from "obsidian";
 import { AnthropicAssistant, OpenAIAssistant } from "./openai_api";
+import { ALL_MODELS } from "./settings";
 
 function generateUniqueId() {
 	return "_" + Math.random().toString(36).substr(2, 9);
@@ -76,6 +77,10 @@ export class PromptModal extends Modal {
 	onSubmit: (input_dict: object) => void;
 	is_img_modal: boolean;
 	settings: { [key: string]: string };
+	selectedModel: string;
+	critiqueEnabled: boolean;
+	selectedCritiqueModel: string;
+	primaryResponse: string;
 
 	constructor(
 		app: App,
@@ -91,6 +96,10 @@ export class PromptModal extends Modal {
 			num_img: "1",
 			is_hd: "true",
 		};
+		this.selectedModel = settings.modelName;
+		this.critiqueEnabled = false;
+		this.selectedCritiqueModel = settings.critiqueModelName;
+		this.primaryResponse = "";
 	}
 
 	build_image_modal() {
@@ -178,6 +187,11 @@ export class PromptModal extends Modal {
 
 	submit_action() {
 		if (this.param_dict["prompt_text"]) {
+			// Add model selection and critique info to param_dict
+			this.param_dict["selectedModel"] = this.selectedModel;
+			this.param_dict["critiqueEnabled"] = this.critiqueEnabled.toString();
+			this.param_dict["selectedCritiqueModel"] = this.selectedCritiqueModel;
+			
 			this.close();
 			this.onSubmit(this.param_dict);
 		}
@@ -289,6 +303,92 @@ export class PromptModal extends Modal {
 			// Move dropdown above input field
 			contentEl.insertBefore(dropdown_container, input_container);
 		}
+
+		// Model selection and critique options
+		const options_container = contentEl.createEl("div", {
+			cls: "prompt-options-container",
+			attr: { style: "margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" }
+		});
+
+		// Primary model selector
+		const model_container = options_container.createEl("div", {
+			attr: { style: "margin-bottom: 10px;" }
+		});
+		const model_label = model_container.createEl("label", {
+			text: "Model:",
+			attr: { style: "display: inline-block; width: 80px; font-weight: bold;" }
+		});
+		const model_select = model_container.createEl("select", {
+			attr: { style: "width: 200px; padding: 3px;" }
+		});
+		
+		// Populate model options
+		Object.keys(ALL_MODELS).forEach(modelKey => {
+			const option = model_select.createEl("option", {
+				value: modelKey,
+				text: ALL_MODELS[modelKey as keyof typeof ALL_MODELS]
+			});
+			if (modelKey === this.selectedModel) {
+				option.selected = true;
+			}
+		});
+		
+		model_select.addEventListener("change", (evt) => {
+			this.selectedModel = (evt.target as HTMLSelectElement).value;
+		});
+
+		// Critique toggle
+		const critique_container = options_container.createEl("div", {
+			attr: { style: "margin-bottom: 10px;" }
+		});
+		const critique_checkbox = critique_container.createEl("input", {
+			type: "checkbox",
+			attr: { style: "margin-right: 5px;" }
+		});
+		const critique_label = critique_container.createEl("label", {
+			text: "Enable critique mode",
+			attr: { style: "font-weight: bold; cursor: pointer;" }
+		});
+		critique_label.addEventListener("click", () => {
+			critique_checkbox.checked = !critique_checkbox.checked;
+			this.critiqueEnabled = critique_checkbox.checked;
+			critique_model_container.style.display = this.critiqueEnabled ? "block" : "none";
+		});
+		
+		critique_checkbox.addEventListener("change", (evt) => {
+			this.critiqueEnabled = (evt.target as HTMLInputElement).checked;
+			critique_model_container.style.display = this.critiqueEnabled ? "block" : "none";
+		});
+
+		// Critique model selector (initially hidden)
+		const critique_model_container = options_container.createEl("div", {
+			attr: { style: "margin-left: 20px; display: none;" }
+		});
+		const critique_model_label = critique_model_container.createEl("label", {
+			text: "Critique model:",
+			attr: { style: "display: inline-block; width: 100px; font-weight: bold;" }
+		});
+		const critique_model_select = critique_model_container.createEl("select", {
+			attr: { style: "width: 200px; padding: 3px;" }
+		});
+		
+		// Populate critique model options
+		Object.keys(ALL_MODELS).forEach(modelKey => {
+			const option = critique_model_select.createEl("option", {
+				value: modelKey,
+				text: ALL_MODELS[modelKey as keyof typeof ALL_MODELS]
+			});
+			if (modelKey === this.selectedCritiqueModel) {
+				option.selected = true;
+			}
+		});
+		
+		critique_model_select.addEventListener("change", (evt) => {
+			this.selectedCritiqueModel = (evt.target as HTMLSelectElement).value;
+		});
+
+		// Move options above input field
+		contentEl.insertBefore(options_container, input_container);
 
 		input_field.addEventListener("keypress", (evt) => {
 			if (evt.key === "Enter") {
