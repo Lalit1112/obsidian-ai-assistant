@@ -125,13 +125,19 @@ export default class AiAssistantPlugin extends Plugin {
 							setTimeout(async () => {
 								try {
 									const critiqueAssistant = this.getAssistantForModel(selectedCritiqueModel);
-									const critiquePrompt = `Review the following response and provide constructive feedback. Focus on accuracy, clarity, completeness, and potential improvements. Do not rewrite the content - only provide analytical comments and suggestions.
+									const critiquePrompt = `Critique this response. Be precise and direct - no filler words or lengthy explanations. Use bullet points.
 
-Original request: "${x["prompt_text"]}"
-Original text: "${selected_text}"
-Response to critique: "${answer}"
+Request: "${x["prompt_text"]}"
+Original: "${selected_text}"
+Response: "${answer}"
 
-Your critique:`;
+Provide:
+• Accuracy issues (if any)
+• Missing elements
+• Clarity problems  
+• Specific improvements
+
+Critique:`;
 
 									const critique = await critiqueAssistant.text_api_call([
 										{
