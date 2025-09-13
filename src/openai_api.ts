@@ -251,6 +251,27 @@ export class GroqAssistant extends OpenAIAssistant {
 		}
 	};
 
+	isReasoningModel = (modelName: string): boolean => {
+		return modelName.includes("deepseek") || modelName.includes("qwen");
+	};
+
+	filterReasoningContent = (response: string): string => {
+		if (!response) return response;
+
+		// Remove thinking tags and content between them
+		let cleanedResponse = response.replace(/<think>[\s\S]*?<\/think>/gi, '');
+		
+		// Remove other common reasoning markers
+		cleanedResponse = cleanedResponse.replace(/<thinking>[\s\S]*?<\/thinking>/gi, '');
+		cleanedResponse = cleanedResponse.replace(/\[thinking\][\s\S]*?\[\/thinking\]/gi, '');
+		
+		// Remove empty lines and trim
+		cleanedResponse = cleanedResponse.replace(/^\s*[\r\n]/gm, '').trim();
+		
+		console.log("🧠 Filtered reasoning content from response");
+		return cleanedResponse;
+	};
+
 	text_api_call = async (
 		prompt_list: { [key: string]: string }[],
 		htmlEl?: HTMLElement,
@@ -272,6 +293,8 @@ export class GroqAssistant extends OpenAIAssistant {
 
 		try {
 			const streamMode = htmlEl !== undefined;
+			const isReasoning = this.isReasoningModel(this.modelName);
+			console.log("🧠 Is reasoning model:", isReasoning);
 			new Notice(`🚀 Calling Groq with ${this.modelName}...`);
 
 			if (streamMode) {
@@ -288,9 +311,19 @@ export class GroqAssistant extends OpenAIAssistant {
 					const content = chunk.choices[0]?.delta?.content;
 					if (content) {
 						responseText = responseText.concat(content);
-						htmlEl.innerHTML = responseText;
+						// For reasoning models, don't update HTML until filtering is complete
+						if (!isReasoning) {
+							htmlEl.innerHTML = responseText;
+						}
 					}
 				}
+				
+				// Filter reasoning content if needed
+				if (isReasoning) {
+					responseText = this.filterReasoningContent(responseText);
+					htmlEl.innerHTML = responseText;
+				}
+				
 				console.log("✅ Groq streaming response completed, length:", responseText.length);
 				new Notice("✅ Groq response completed!");
 				return responseText;
@@ -303,9 +336,16 @@ export class GroqAssistant extends OpenAIAssistant {
 					stream: false,
 				});
 
-				console.log("✅ Groq response received:", response.choices[0].message.content?.substring(0, 100) + "...");
+				let responseContent = response.choices[0].message.content;
+				
+				// Filter reasoning content if needed
+				if (isReasoning && responseContent) {
+					responseContent = this.filterReasoningContent(responseContent);
+				}
+
+				console.log("✅ Groq response received:", responseContent?.substring(0, 100) + "...");
 				new Notice("✅ Groq response completed!");
-				return response.choices[0].message.content;
+				return responseContent;
 			}
 		} catch (err) {
 			console.error("❌ Groq API call failed:", err);
