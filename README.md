@@ -4,16 +4,17 @@ Simple plugin to enable interactions with AI models such as [OpenAI ChatGPT](htt
 
 The current available features of this plugin are:
 
--   🤖 Text assistant with OpenAI GPTs, Anthropic Claude, and Google Gemini models,
+-   🤖 Text assistant with OpenAI GPTs, Anthropic Claude, Google Gemini, and Groq Cloud models,
 -   🖼 Image generation with DALL·E3 and DALL·E2,
 -   🗣 Speech to text with Whisper.
 
 ## Latest Updates
 
+- **NEW**: Groq Cloud integration - 4 high-performance models with ultra-fast inference
 - **NEW**: Model selection per query - choose different models for individual prompts without changing defaults
 - **NEW**: Critique mode - get a second AI model's analysis and feedback on responses (60-second delay)
 - **NEW**: Quartz publishing optimization prompt - prepare notes for web publication with SEO and readability suggestions
-- Claude 4 models and OpenAI o3 / o4 series are now available.
+- Claude 4 models and OpenAI GPT-5 series are now available
 - **NEW**: Google Gemini 2.5 Pro and 2.5 Flash models now supported!
 - **NEW**: Custom prompts feature - define up to 3 frequently used prompts for quick selection
 - **IMPROVED**: Better prompt behavior setting with clearer options (replace vs. append)
@@ -43,7 +44,7 @@ Chat mode now allows you to upload images to interact with GPT4-Vision or Claude
 Prompt mode allows you to use a selected piece of text from your note as input for the assistant.
 From here you can ask the assistant to translate, summarize, generate code etc.
 
-**Model Selection**: Choose different AI models for individual queries without changing your default settings. Select from OpenAI, Anthropic Claude, or Google Gemini models per request.
+**Model Selection**: Choose different AI models for individual queries without changing your default settings. Select from OpenAI GPT-5 series, Anthropic Claude, Google Gemini, or Groq Cloud models per request.
 
 **Critique Mode**: Enable a second AI model to analyze and provide feedback on the primary response. After receiving the initial response, wait 60 seconds for detailed critique with bullet-point feedback on accuracy, missing elements, clarity, and improvements.
 
@@ -72,7 +73,11 @@ The transcript will be immediately added to your note at your cursor location.
 
 ### Text Assistant
 
--   **Model choice**: choice of the default text model. Latest OpenAI, Anthropic, and Google Gemini models are available.
+-   **Model choice**: choice of the default text model. Latest models available:
+    - **OpenAI**: GPT-5, GPT-5 Mini, GPT-5 Nano, GPT-4o, GPT-4.1
+    - **Anthropic**: Claude Opus 4.1, Claude Sonnet 4
+    - **Google**: Gemini 2.5 Pro, Gemini 2.5 Flash
+    - **Groq Cloud**: Llama 3.3 70B Versatile, Qwen 3 32B, GPT-OSS 120B, DeepSeek R1 Distill Llama 70B
 -   **Critique Model**: choose the default model for critique mode (should be stronger than your primary model for best analysis)
 -   **Maximum number of tokens** in the generated answer
 -   **Prompt behavior**: When ON - replaces selected text with AI response. When OFF - keeps selected text and adds AI response below it.
@@ -110,7 +115,8 @@ The transcript will be immediately added to your note at your cursor location.
 
 ## Requirements
 
--   To use this plugin, with OpenAI models, you need an official API key from [here](https://platform.openai.com/account/api-keys),
--   To use this plugin, with Anthropic Claude models, you need an official API key from [here](https://console.anthropic.com/settings/keys),
--   To use this plugin, with Google Gemini models, you need an official API key from [here](https://ai.google.dev/gemini-api/docs/api-key).
+-   To use this plugin with **OpenAI models**, you need an official API key from [here](https://platform.openai.com/account/api-keys)
+-   To use this plugin with **Anthropic Claude models**, you need an official API key from [here](https://console.anthropic.com/settings/keys)
+-   To use this plugin with **Google Gemini models**, you need an official API key from [here](https://ai.google.dev/gemini-api/docs/api-key)
+-   To use this plugin with **Groq Cloud models**, you need an official API key from [here](https://console.groq.com/keys)
 
