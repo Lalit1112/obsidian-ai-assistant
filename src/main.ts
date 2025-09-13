@@ -227,14 +227,21 @@ Critique:`;
 
 	getAssistantForModel(modelName: string): OpenAIAssistant | AnthropicAssistant | GeminiAssistant | GroqAssistant {
 		// Determine which assistant to use based on model name
+		console.log("🔍 Model Selection Debug - Model Name:", modelName);
+		
 		if (modelName.startsWith("claude")) {
+			console.log("✅ Detected Anthropic model, using AnthropicAssistant");
 			return new AnthropicAssistant(this.settings.openAIapiKey, this.settings.anthropicApiKey, modelName, this.settings.maxTokens);
 		} else if (modelName.startsWith("gemini")) {
+			console.log("✅ Detected Gemini model, using GeminiAssistant");
 			return new GeminiAssistant(this.settings.openAIapiKey, this.settings.geminiApiKey, modelName, this.settings.maxTokens);
 		} else if (modelName.includes("llama") || modelName.includes("qwen") || modelName.includes("deepseek") || modelName.includes("gpt-oss")) {
+			console.log("✅ Detected Groq model, using GroqAssistant");
+			console.log("Groq API Key configured:", this.settings.groqApiKey ? "YES" : "NO");
 			return new GroqAssistant(this.settings.openAIapiKey, this.settings.groqApiKey, modelName, this.settings.maxTokens);
 		} else {
 			// Default to OpenAI for all other models
+			console.log("✅ Default to OpenAI model, using OpenAIAssistant");
 			return new OpenAIAssistant(this.settings.openAIapiKey, modelName, this.settings.maxTokens);
 		}
 	}

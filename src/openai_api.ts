@@ -238,7 +238,16 @@ export class GroqAssistant extends OpenAIAssistant {
 	}
 
 	display_error = (err: any) => {
-		new Notice(`## Groq API Error: ${err}.`);
+		console.error("Groq API Error:", err);
+		if (err.response) {
+			console.error("Response data:", err.response.data);
+			console.error("Response status:", err.response.status);
+			new Notice(`Groq API Error (${err.response.status}): ${err.response.data?.error?.message || err.message}`);
+		} else if (err.message) {
+			new Notice(`Groq API Error: ${err.message}`);
+		} else {
+			new Notice(`Groq API Error: ${JSON.stringify(err)}`);
+		}
 	};
 
 	text_api_call = async (
@@ -246,10 +255,26 @@ export class GroqAssistant extends OpenAIAssistant {
 		htmlEl?: HTMLElement,
 		view?: MarkdownView,
 	) => {
+		console.log("🔧 Groq API Call Debug Info:");
+		console.log("Model:", this.modelName);
+		console.log("Max Tokens:", this.maxTokens);
+		console.log("API Key (first 10 chars):", this.groqApiKey ? this.groqApiKey.substring(0, 10) + "..." : "NOT SET");
+		console.log("Messages:", prompt_list);
+		console.log("Stream mode:", htmlEl !== undefined);
+
+		if (!this.groqApiKey || this.groqApiKey.trim() === "") {
+			const errorMsg = "Groq API key is not set! Please add your API key in plugin settings.";
+			console.error(errorMsg);
+			new Notice(errorMsg);
+			return "Error: Groq API key not configured";
+		}
+
 		try {
 			const streamMode = htmlEl !== undefined;
+			new Notice(`🚀 Calling Groq with ${this.modelName}...`);
 
 			if (streamMode) {
+				console.log("Starting streaming response...");
 				const response = await this.groqClient.chat.completions.create({
 					messages: prompt_list as any,
 					model: this.modelName,
@@ -265,8 +290,11 @@ export class GroqAssistant extends OpenAIAssistant {
 						htmlEl.innerHTML = responseText;
 					}
 				}
+				console.log("✅ Groq streaming response completed, length:", responseText.length);
+				new Notice("✅ Groq response completed!");
 				return responseText;
 			} else {
+				console.log("Starting non-streaming response...");
 				const response = await this.groqClient.chat.completions.create({
 					messages: prompt_list as any,
 					model: this.modelName,
@@ -274,10 +302,14 @@ export class GroqAssistant extends OpenAIAssistant {
 					stream: false,
 				});
 
+				console.log("✅ Groq response received:", response.choices[0].message.content?.substring(0, 100) + "...");
+				new Notice("✅ Groq response completed!");
 				return response.choices[0].message.content;
 			}
 		} catch (err) {
+			console.error("❌ Groq API call failed:", err);
 			this.display_error(err);
+			return "Error occurred while calling Groq API";
 		}
 	};
 }
