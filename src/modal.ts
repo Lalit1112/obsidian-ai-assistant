@@ -215,6 +215,11 @@ export class PromptModal extends Modal {
 				key: "MARKDOWN_STRUCTURE",
 				display: "🏗️ Suggest markdown structure improvements",
 				prompt: "Act as an expert in document structuring using markdown. Analyze the following note and provide a bulleted list of actionable suggestions to improve its organization and readability. Your feedback should cover:\n\nHeading Hierarchy: Correct use of H1, H2, H3, etc.\n\nUse of Lists: Where to use bulleted or numbered lists to break up text.\n\nEmphasis: Better use of bold, italics, and highlights.\n\nCallouts & Blockquotes: Opportunities to use callouts (>[!info]) or blockquotes (>) to emphasize key information.\n\nFor each suggestion, briefly explain the reasoning behind it."
+			},
+			{
+				key: "QUARTZ_PUBLISHING",
+				display: "🌐 Optimize for Quartz web publishing",
+				prompt: "Act as a web content editor preparing this Obsidian note for publication on a Quartz website. Analyze its structure, formatting, and metadata for public readability and web-friendliness. Provide a bulleted list of actionable suggestions. Your feedback should cover:\n\nFrontmatter: Suggest an optimal title, description, reading time and tags for SEO and clarity.\n\nWeb Readability: Recommend breaking up long paragraphs, using more lists, or adding callouts to make the content easier to scan.\n\nInternal Linking: Identify opportunities to add [[wikilinks]] to other relevant notes, creating a better navigation experience for visitors.\n\nClarity for Public Audience: Point out any jargon, abbreviations, or \"insider\" shorthand that might confuse a reader who doesn't have access to your full vault.\n\nQuartz-Specific Features: Suggest where to add components like Mermaid diagrams or other Quartz-supported elements to better illustrate concepts.\n\nFor each suggestion, briefly explain why it's important for a public-facing website."
 			}
 		];
 
