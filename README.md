@@ -10,6 +10,9 @@ The current available features of this plugin are:
 
 ## Latest Updates
 
+- **NEW**: Model selection per query - choose different models for individual prompts without changing defaults
+- **NEW**: Critique mode - get a second AI model's analysis and feedback on responses (60-second delay)
+- **NEW**: Quartz publishing optimization prompt - prepare notes for web publication with SEO and readability suggestions
 - Claude 4 models and OpenAI o3 / o4 series are now available.
 - **NEW**: Google Gemini 2.5 Pro and 2.5 Flash models now supported!
 - **NEW**: Custom prompts feature - define up to 3 frequently used prompts for quick selection
@@ -40,9 +43,16 @@ Chat mode now allows you to upload images to interact with GPT4-Vision or Claude
 Prompt mode allows you to use a selected piece of text from your note as input for the assistant.
 From here you can ask the assistant to translate, summarize, generate code etc.
 
-**Custom Prompts**: Define up to 3 frequently used prompts in the settings (e.g., "Translate to Spanish", "Summarize this text"). These will appear as quick-select options in the prompt modal, saving you time on common tasks.
+**Model Selection**: Choose different AI models for individual queries without changing your default settings. Select from OpenAI, Anthropic Claude, or Google Gemini models per request.
 
-**Grammar Fix**: A built-in "📝 Fix grammar and spelling (with highlights)" option is always available in the dropdown. This special prompt will highlight all changes made using ==markdown highlighting== syntax, making it easy to see exactly what was corrected.
+**Critique Mode**: Enable a second AI model to analyze and provide feedback on the primary response. After receiving the initial response, wait 60 seconds for detailed critique with bullet-point feedback on accuracy, missing elements, clarity, and improvements.
+
+**Built-in Prompts**: Three specialized prompts are always available:
+- **📝 Fix grammar and spelling (with highlights)** - Enhanced grammar correction with ==markdown highlighting== for all changes
+- **🏗️ Suggest markdown structure improvements** - Document organization and readability suggestions
+- **🌐 Optimize for Quartz web publishing** - Prepare notes for web publication with SEO and readability guidance
+
+**Custom Prompts**: Define up to 3 frequently used prompts in the settings (e.g., "Translate to Spanish", "Summarize this text"). These will appear as quick-select options in the prompt modal, saving you time on common tasks.
 
 ### 🖼 Image Assistant
 
@@ -62,7 +72,8 @@ The transcript will be immediately added to your note at your cursor location.
 
 ### Text Assistant
 
--   **Model choice**: choice of the text model. Latest OpenAI, Anthropic, and Google Gemini models are available.
+-   **Model choice**: choice of the default text model. Latest OpenAI, Anthropic, and Google Gemini models are available.
+-   **Critique Model**: choose the default model for critique mode (should be stronger than your primary model for best analysis)
 -   **Maximum number of tokens** in the generated answer
 -   **Prompt behavior**: When ON - replaces selected text with AI response. When OFF - keeps selected text and adds AI response below it.
 -   **Custom Prompts**: Define up to 3 frequently used prompts that will appear as quick-select options in prompt mode.
