@@ -81,6 +81,7 @@ export class PromptModal extends Modal {
 	critiqueEnabled: boolean;
 	selectedCritiqueModel: string;
 	primaryResponse: string;
+	responseLength: string;
 
 	constructor(
 		app: App,
@@ -100,6 +101,7 @@ export class PromptModal extends Modal {
 		this.critiqueEnabled = false;
 		this.selectedCritiqueModel = settings.critiqueModelName;
 		this.primaryResponse = "";
+		this.responseLength = "normal"; // "short" or "long"
 	}
 
 	build_image_modal() {
@@ -234,6 +236,31 @@ export class PromptModal extends Modal {
 				key: "QUARTZ_PUBLISHING",
 				display: "🌐 Optimize for Quartz web publishing",
 				prompt: "Act as a web content editor preparing this Obsidian note for publication on a Quartz website. Analyze its structure, formatting, and metadata for public readability and web-friendliness. Provide a bulleted list of actionable suggestions. Your feedback should cover:\n\nFrontmatter: Suggest an optimal title, description, reading time and tags for SEO and clarity.\n\nWeb Readability: Recommend breaking up long paragraphs, using more lists, or adding callouts to make the content easier to scan.\n\nInternal Linking: Identify opportunities to add [[wikilinks]] to other relevant notes, creating a better navigation experience for visitors.\n\nClarity for Public Audience: Point out any jargon, abbreviations, or \"insider\" shorthand that might confuse a reader who doesn't have access to your full vault.\n\nQuartz-Specific Features: Suggest where to add components like Mermaid diagrams or other Quartz-supported elements to better illustrate concepts.\n\nFor each suggestion, briefly explain why it's important for a public-facing website."
+			},
+			{
+				key: "FACT_CHECK_GROQ",
+				display: "🔍 Fact Check on Web (GroqCloud)",
+				prompt: "You are an expert at verifying tech content accuracy. You always research on the Internet, check official docs or community if available and confirm whether written content is technically accurate or not. When asked to write, you prefer to write accurate content and mention their source as well.\n\nFact check this content for accuracy and provide sources: {text}"
+			},
+			{
+				key: "RESEARCH_GROQ",
+				display: "🔬 Research on Web (GroqCloud)",
+				prompt: "You are an expert researcher specializing in technical content. You always conduct thorough internet research, consult official documentation and community resources to provide comprehensive, accurate information. You cite your sources and provide detailed, well-researched responses.\n\nResearch this topic thoroughly and provide detailed information with sources: {text}"
+			},
+			{
+				key: "MATH_CALCULATION_GROQ",
+				display: "🧮 Maths Calculation (GroqCloud)",
+				prompt: "You are an expert mathematician with access to computational tools. You always perform accurate calculations, show your work step by step, and verify results. You can execute code to solve complex mathematical problems and provide precise numerical answers.\n\nCalculate and solve this mathematical problem, showing your work: {text}"
+			},
+			{
+				key: "PYTHON_DEBUG_GROQ",
+				display: "🐍 Python Code Testing & Debugging (GroqCloud)",
+				prompt: "You are an expert Python developer specializing in code testing and debugging. You can execute Python code to test functionality, identify bugs, suggest improvements, and provide working solutions. You always test your code and provide comprehensive debugging information.\n\nTest, debug, and improve this Python code: {text}"
+			},
+			{
+				key: "PYTHON_CREATE_GROQ",
+				display: "💻 Python Code Creation (GroqCloud)",
+				prompt: "You are an expert Python developer specializing in creating clean, efficient, and well-documented code. You can execute Python code to test your implementations and ensure they work correctly. You always provide working solutions with proper error handling, documentation, and best practices.\n\nCreate Python code for this requirement: {text}"
 			}
 		];
 
@@ -387,12 +414,82 @@ export class PromptModal extends Modal {
 			this.selectedCritiqueModel = (evt.target as HTMLSelectElement).value;
 		});
 
+		// Response length selector
+		const length_container = options_container.createEl("div", {
+			attr: { style: "margin-bottom: 10px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;" }
+		});
+		const length_label = length_container.createEl("label", {
+			text: "Response length:",
+			attr: { style: "display: inline-block; width: 120px; font-weight: bold;" }
+		});
+
+		const length_radio_container = length_container.createEl("div", {
+			attr: { style: "display: inline-block;" }
+		});
+
+		// Short response option
+		const short_radio = length_radio_container.createEl("input", {
+			attr: {
+				type: "radio",
+				name: "response_length",
+				value: "short",
+				style: "margin-right: 5px; margin-left: 15px;"
+			}
+		});
+		const short_label = length_radio_container.createEl("label", {
+			text: "Short (~500 tokens)",
+			attr: { style: "cursor: pointer; margin-right: 15px;" }
+		});
+
+		// Normal response option
+		const normal_radio = length_radio_container.createEl("input", {
+			attr: {
+				type: "radio",
+				name: "response_length",
+				value: "normal",
+				style: "margin-right: 5px;"
+			}
+		});
+		normal_radio.checked = true; // Default to normal
+		const normal_label = length_radio_container.createEl("label", {
+			text: "Normal (~3000 tokens)",
+			attr: { style: "cursor: pointer; margin-right: 15px;" }
+		});
+
+		// Long response option
+		const long_radio = length_radio_container.createEl("input", {
+			attr: {
+				type: "radio",
+				name: "response_length",
+				value: "long",
+				style: "margin-right: 5px;"
+			}
+		});
+		const long_label = length_radio_container.createEl("label", {
+			text: "Long (~5000 tokens)",
+			attr: { style: "cursor: pointer;" }
+		});
+
+		// Add event listeners
+		short_radio.addEventListener("change", () => {
+			if (short_radio.checked) this.responseLength = "short";
+		});
+
+		normal_radio.addEventListener("change", () => {
+			if (normal_radio.checked) this.responseLength = "normal";
+		});
+
+		long_radio.addEventListener("change", () => {
+			if (long_radio.checked) this.responseLength = "long";
+		});
+
 		// Move options above input field
 		contentEl.insertBefore(options_container, input_container);
 
 		input_field.addEventListener("keypress", (evt) => {
 			if (evt.key === "Enter") {
 				this.param_dict["prompt_text"] = input_field.value.trim();
+				this.param_dict["responseLength"] = this.responseLength;
 				this.submit_action();
 			}
 		});
@@ -403,6 +500,7 @@ export class PromptModal extends Modal {
 		});
 		submit_btn.addEventListener("click", () => {
 			this.param_dict["prompt_text"] = input_field.value.trim();
+			this.param_dict["responseLength"] = this.responseLength;
 			this.submit_action();
 		});
 

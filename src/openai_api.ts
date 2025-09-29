@@ -52,6 +52,7 @@ export class OpenAIAssistant {
 					? { max_completion_tokens: this.maxTokens }
 					: { max_tokens: this.maxTokens }),
 			};
+			console.log(`🚀 OpenAI API Request - Model: ${model}, Max tokens: ${this.maxTokens}, Stream: ${streamMode}`);
 
 			const response = await this.apiFun.chat.completions.create(params);
 
@@ -152,6 +153,7 @@ export class AnthropicAssistant extends OpenAIAssistant {
 		view?: MarkdownView,
 	) => {
 		try {
+			console.log(`🚀 Anthropic API Request - Model: ${this.modelName}, Max tokens: ${this.maxTokens}`);
 			const response = await request({
 				url: "https://api.anthropic.com/v1/messages",
 
@@ -207,6 +209,7 @@ export class GeminiAssistant extends OpenAIAssistant {
 			// Convert messages to Gemini format
 			const prompt = prompt_list.map(msg => msg.content).join('\n');
 
+			console.log(`🚀 Gemini API Request - Model: ${this.modelName}, Max tokens: ${this.maxTokens}`);
 			const response = await this.genAI.models.generateContent({
 				model: this.modelName,
 				contents: prompt,
@@ -218,6 +221,7 @@ export class GeminiAssistant extends OpenAIAssistant {
 		}
 	};
 }
+
 
 export class GroqAssistant extends OpenAIAssistant {
 	groqApiKey: string;
@@ -299,6 +303,7 @@ export class GroqAssistant extends OpenAIAssistant {
 
 			if (streamMode) {
 				console.log("Starting streaming response...");
+				console.log(`🚀 Groq API Request - Model: ${this.modelName}, Max tokens: ${this.maxTokens}, Stream: true`);
 				const response = await this.groqClient.chat.completions.create({
 					messages: prompt_list as any,
 					model: this.modelName,
@@ -329,6 +334,7 @@ export class GroqAssistant extends OpenAIAssistant {
 				return responseText;
 			} else {
 				console.log("Starting non-streaming response...");
+				console.log(`🚀 Groq API Request - Model: ${this.modelName}, Max tokens: ${this.maxTokens}, Stream: false`);
 				const response = await this.groqClient.chat.completions.create({
 					messages: prompt_list as any,
 					model: this.modelName,
